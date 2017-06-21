@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <PackageId>MikeDg.IdentityServer4.MongoDB</PackageId>
+    <PackageTags>IdentityServer4;MongoDB</PackageTags>
+    <RepositoryUrl>https://github.com/microserviceph/IdentityServer4.MongoDB</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageProjectUrl>https://github.com/microserviceph/IdentityServer4.MongoDB</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/microserviceph/IdentityServer4.MongoDB/blob/master/LICENSE</PackageLicenseUrl>
+    <Company>Vsslabs</Company>
+    <Authors>Michael de Guzman</Authors>
+    <Description>A IdentityServer4 MongoDB storage</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="IdentityServer4" Version="1.5.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.2" />
+    <PackageReference Include="MongoDB.Bson" Version="2.4.4" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
+    
+  </ItemGroup>
+</Project>
