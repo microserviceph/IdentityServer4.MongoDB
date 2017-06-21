@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        internal static IIdentityServerBuilder AddConfigurationStore(this IIdentityServerBuilder builder)
+        public static IIdentityServerBuilder AddConfigurationStore(this IIdentityServerBuilder builder)
         {
             builder.Services.AddTransient<IConfigurationMongoDbContext, ConfigurationMongoDbContext>();
 
@@ -35,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        internal static IIdentityServerBuilder AddOperationalStore(
+        public static IIdentityServerBuilder AddOperationalStore(
             this IIdentityServerBuilder builder,
             Action<TokenCleanupOptions> tokenCleanUpOptions = null)
         {
@@ -51,7 +51,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        internal static IApplicationBuilder UseIdentityServerMongoDBTokenCleanup(this IApplicationBuilder app, IApplicationLifetime applicationLifetime)
+        public static IApplicationBuilder UseIdentityServerMongoDBTokenCleanup(this IApplicationBuilder app, IApplicationLifetime applicationLifetime)
         {
             var tokenCleanup = app.ApplicationServices.GetService<TokenCleanup>();
             if (tokenCleanup == null)

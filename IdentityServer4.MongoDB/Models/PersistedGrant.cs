@@ -1,9 +1,11 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using System;
 
 namespace  IdentityServer4.MongoDB.Models
 {
     public class PersistedGrant
     {
+        public ObjectId Id { get; set; }
         public string Key { get; set; }
         public string Type { get; set; }
         public string SubjectId { get; set; }

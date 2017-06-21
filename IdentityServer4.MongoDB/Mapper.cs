@@ -6,7 +6,7 @@ namespace IdentityServer4.MongoDB
 {
     public static class Mapper
     {
-        internal static Models.Client ToEntity(this Client client)
+        public static Models.Client ToEntity(this Client client)
         {
             return new Models.Client
             {
@@ -60,7 +60,7 @@ namespace IdentityServer4.MongoDB
             };
         }
 
-        internal static Client ToModel(this Models.Client client)
+        public static Client ToModel(this Models.Client client)
         {
             return new Client
             {
@@ -114,7 +114,7 @@ namespace IdentityServer4.MongoDB
             };
         }
 
-        internal static Models.ApiResource ToEntity(this ApiResource model)
+        public static Models.ApiResource ToEntity(this ApiResource model)
         {
             return new Models.ApiResource(model.Name, model.DisplayName, model.UserClaims)
             {
@@ -144,7 +144,7 @@ namespace IdentityServer4.MongoDB
             };
         }
 
-        internal static Models.IdentityResource ToEntity(this IdentityResource model)
+        public static Models.IdentityResource ToEntity(this IdentityResource model)
         {
             return new Models.IdentityResource(model.Name, model.DisplayName, model.UserClaims)
             {
@@ -156,7 +156,7 @@ namespace IdentityServer4.MongoDB
             };
         }
 
-        internal static ApiResource ToModel(this Models.ApiResource model)
+        public static ApiResource ToModel(this Models.ApiResource model)
         {
             return new ApiResource(model.Name, model.DisplayName, model.UserClaims)
             {
@@ -183,7 +183,7 @@ namespace IdentityServer4.MongoDB
             };
         }
 
-        internal static IdentityResource ToModel(this Models.IdentityResource model)
+        public static IdentityResource ToModel(this Models.IdentityResource model)
         {
             return new IdentityResource(model.Name, model.DisplayName, model.UserClaims)
             {
