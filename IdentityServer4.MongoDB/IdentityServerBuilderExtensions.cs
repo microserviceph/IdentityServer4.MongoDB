@@ -4,12 +4,27 @@ using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IdentityServerBuilderExtensionsMongoDB
     {
+        public static IIdentityServerBuilder AddConfigurationDBOption(this IIdentityServerBuilder builder, IConfiguration config)
+        {
+            builder.Services.Configure<ConfigurationDBOption>(config);
+
+            return builder;
+        }
+
+        public static IIdentityServerBuilder AddOperationMongoDBOption(this IIdentityServerBuilder builder, IConfiguration config)
+        {
+            builder.Services.Configure<OperationMongoDBOption>(config);
+
+            return builder;
+        }
+
         public static IIdentityServerBuilder ConfigureConfigurationDBOption(this IIdentityServerBuilder builder, Action<ConfigurationDBOption> configure)
         {
             builder.Services.Configure(configure);

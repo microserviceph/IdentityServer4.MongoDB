@@ -11,6 +11,7 @@
     <Authors>Michael de Guzman</Authors>
     <Description>A IdentityServer4 MongoDB storage</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="IdentityServer4" Version="1.5.2" />
