@@ -44,11 +44,8 @@ namespace IdentityServer4.MongoDB
                 IdentityTokenLifetime = client.IdentityTokenLifetime,
                 IncludeJwtId = client.IncludeJwtId,
                 LogoUri = client.LogoUri,
-                LogoutSessionRequired = client.LogoutSessionRequired,
-                LogoutUri = client.LogoutUri,
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris.ToList(),
                 ProtocolType = client.ProtocolType,
-                PrefixClientClaims = client.PrefixClientClaims,
                 UpdateAccessTokenClaimsOnRefresh = client.UpdateAccessTokenClaimsOnRefresh,
                 SlidingRefreshTokenLifetime = client.SlidingRefreshTokenLifetime,
                 RequirePkce = client.RequirePkce,
@@ -56,7 +53,15 @@ namespace IdentityServer4.MongoDB
                 RedirectUris = client.RedirectUris.ToList(),
                 RefreshTokenExpiration = (int)client.RefreshTokenExpiration,
                 RefreshTokenUsage = (int)client.RefreshTokenUsage,
-                RequireClientSecret = client.RequireClientSecret
+                RequireClientSecret = client.RequireClientSecret,
+                BackChannelLogoutSessionRequired = client.BackChannelLogoutSessionRequired,
+                BackChannelLogoutUri = client.BackChannelLogoutUri,
+                ClientClaimsPrefix = client.ClientClaimsPrefix,
+                ConsentLifetime = client.ConsentLifetime,
+                FrontChannelLogoutSessionRequired = client.FrontChannelLogoutSessionRequired,
+                FrontChannelLogoutUri = client.FrontChannelLogoutUri,
+                PairWiseSubjectSalt = client.PairWiseSubjectSalt,
+                Properties = client.Properties
             };
         }
 
@@ -98,11 +103,8 @@ namespace IdentityServer4.MongoDB
                 IdentityTokenLifetime = client.IdentityTokenLifetime,
                 IncludeJwtId = client.IncludeJwtId,
                 LogoUri = client.LogoUri,
-                LogoutSessionRequired = client.LogoutSessionRequired,
-                LogoutUri = client.LogoutUri,
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris,
                 ProtocolType = client.ProtocolType,
-                PrefixClientClaims = client.PrefixClientClaims,
                 UpdateAccessTokenClaimsOnRefresh = client.UpdateAccessTokenClaimsOnRefresh,
                 SlidingRefreshTokenLifetime = client.SlidingRefreshTokenLifetime,
                 RequirePkce = client.RequirePkce,
@@ -110,7 +112,15 @@ namespace IdentityServer4.MongoDB
                 RedirectUris = client.RedirectUris,
                 RefreshTokenExpiration = (TokenExpiration)client.RefreshTokenExpiration,
                 RefreshTokenUsage = (TokenUsage)client.RefreshTokenUsage,
-                RequireClientSecret = client.RequireClientSecret
+                RequireClientSecret = client.RequireClientSecret,
+                BackChannelLogoutSessionRequired = client.BackChannelLogoutSessionRequired,
+                BackChannelLogoutUri = client.BackChannelLogoutUri,
+                ClientClaimsPrefix = client.ClientClaimsPrefix,
+                ConsentLifetime = client.ConsentLifetime,
+                FrontChannelLogoutSessionRequired = client.FrontChannelLogoutSessionRequired,
+                FrontChannelLogoutUri = client.FrontChannelLogoutUri,
+                PairWiseSubjectSalt = client.PairWiseSubjectSalt,
+                Properties = client.Properties
             };
         }
 
@@ -140,7 +150,10 @@ namespace IdentityServer4.MongoDB
                                Required = c.Required,
                                ShowInDiscoveryDocument = c.ShowInDiscoveryDocument
                            })
-                           .ToList()
+                           .ToList(),
+                DisplayName = model.DisplayName,
+                Name = model.Name,
+                UserClaims = model.UserClaims.ToList()
             };
         }
 
@@ -152,7 +165,10 @@ namespace IdentityServer4.MongoDB
                 Description = model.Description,
                 Required = model.Required,
                 Emphasize = model.Emphasize,
-                ShowInDiscoveryDocument = model.ShowInDiscoveryDocument
+                ShowInDiscoveryDocument = model.ShowInDiscoveryDocument,
+                UserClaims = model.UserClaims.ToList(),
+                Name = model.Name,
+                DisplayName = model.DisplayName
             };
         }
 
@@ -177,9 +193,12 @@ namespace IdentityServer4.MongoDB
                                 Name = c.Name,
                                 UserClaims = c.UserClaims,
                                 Required = c.Required,
-                                ShowInDiscoveryDocument = c.ShowInDiscoveryDocument
+                                ShowInDiscoveryDocument = c.ShowInDiscoveryDocument,
                             })
-                            .ToList()
+                            .ToList(),
+                DisplayName = model.DisplayName,
+                Name = model.Name,
+                UserClaims = model.UserClaims
             };
         }
 
@@ -191,7 +210,10 @@ namespace IdentityServer4.MongoDB
                 Description = model.Description,
                 Required = model.Required,
                 Emphasize = model.Emphasize,
-                ShowInDiscoveryDocument = model.ShowInDiscoveryDocument
+                ShowInDiscoveryDocument = model.ShowInDiscoveryDocument,
+                UserClaims = model.UserClaims,
+                Name = model.Name,
+                DisplayName = model.DisplayName
             };
         }
 

@@ -17,6 +17,11 @@ namespace IdentityServer4.MongoDB.Stores
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+        /// <summary>
+        /// Finds the API resource by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
         public async Task<ApiResource> FindApiResourceAsync(string name)
         {
             var filter = Builders<Models.ApiResource>.Filter.Eq(u => u.Name, name);
@@ -26,6 +31,9 @@ namespace IdentityServer4.MongoDB.Stores
             return found.ToModel();
         }
 
+        /// <summary>
+        /// Gets API resources by scope name.
+        /// </summary>
         public async Task<IEnumerable<ApiResource>> FindApiResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
             var names = scopeNames.ToArray();
@@ -47,6 +55,9 @@ namespace IdentityServer4.MongoDB.Stores
                 .ToList();
         }
 
+        /// <summary>
+        /// Gets identity resources by scope name.
+        /// </summary>
         public async Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeAsync(IEnumerable<string> scopeNames)
         {
             var filter = Builders<Models.IdentityResource>.Filter.In(p => p.Name, scopeNames);
@@ -57,7 +68,10 @@ namespace IdentityServer4.MongoDB.Stores
                 .ToList();
         }
 
-        public async Task<Resources> GetAllResources()
+        /// <summary>
+        /// Gets all resources.
+        /// </summary>
+        public async Task<Resources> GetAllResourcesAsync()
         {
             var allApiFilter = Builders<Models.ApiResource>.Filter.Empty;
             var allIndenityFilter = Builders<Models.IdentityResource>.Filter.Empty;
