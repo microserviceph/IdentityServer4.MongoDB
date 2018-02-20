@@ -30,6 +30,10 @@ namespace IdentityServer4.MongoDB
         {
             CollectionName = "PersistedGrant",
         };
+        public bool EnableTokenCleanup { get; set; } = true;
+        public int TokenCleanupInterval { get; set; } = 3600;
+        // public int TokenCleanupBatchSize { get; set; } = 100;
+        
     }
 
     public class Option

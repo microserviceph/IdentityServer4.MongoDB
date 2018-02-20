@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System;
 using System.Threading;
@@ -9,43 +10,86 @@ namespace IdentityServer4.MongoDB
 {
     public class TokenCleanup
     {
-        private readonly TimeSpan _interval;
+        private readonly ILogger<TokenCleanup> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private ILogger<TokenCleanup> _logger;
+        private readonly OperationMongoDBOption _options;
+
         private CancellationTokenSource _source;
 
-        public TokenCleanup(IServiceProvider serviceProvider, ILogger<TokenCleanup> logger, TokenCleanupOptions options)
-        {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        public TimeSpan CleanupInterval => TimeSpan.FromSeconds(_options.TokenCleanupInterval);
 
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        public TokenCleanup(IServiceProvider serviceProvider, ILogger<TokenCleanup> logger, IOptions<OperationMongoDBOption> options)
+        {
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            if (_options.TokenCleanupInterval < 1) throw new ArgumentException("Token cleanup interval must be at least 1 second");
+            // if (_options.TokenCleanupBatchSize < 1) throw new ArgumentException("Token cleanup batch size interval must be at least 1");
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _interval = TimeSpan.FromSeconds(options.Interval);
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public void Start()
         {
-            if (_source != null)
-                throw new InvalidOperationException("Already started");
+            Start(CancellationToken.None);
+        }
+
+        public void Start(CancellationToken cancellationToken)
+        {
+            if (_source != null) throw new InvalidOperationException("Already started. Call Stop first.");
 
             _logger.LogDebug("Starting token cleanup");
 
-            _source = new CancellationTokenSource();
-            Task.Factory.StartNew(() => Start(_source.Token));
+            _source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            Task.Factory.StartNew(() => StartInternal(_source.Token));
         }
 
         public void Stop()
         {
+            if (_source == null) throw new InvalidOperationException("Not started. Call Start first.");
+
             _logger.LogDebug("Stopping token cleanup");
 
-            _source?.Cancel();
+            _source.Cancel();
             _source = null;
         }
 
-        private async Task ClearTokens()
+        private async Task StartInternal(CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogDebug("CancellationRequested. Exiting.");
+                    break;
+                }
+
+                try
+                {
+                    await Task.Delay(CleanupInterval, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    _logger.LogDebug("TaskCanceledException. Exiting.");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Task.Delay exception: {0}. Exiting.", ex.Message);
+                    break;
+                }
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogDebug("CancellationRequested. Exiting.");
+                    break;
+                }
+
+                await ClearTokens();
+            }
+        }
+
+        public async Task ClearTokens()
         {
             try
             {
@@ -53,11 +97,13 @@ namespace IdentityServer4.MongoDB
 
                 using (var serviceScope = _serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
+
                     var dbContext = serviceScope.ServiceProvider.GetService<IOperationDbContext>();
 
                     var filter = Builders<Models.PersistedGrant>.Filter.Lt(x => x.Expiration, DateTime.UtcNow);
 
-                    var expired = await dbContext.PersistedGrant.Find(filter).CountAsync();
+                    var expired = await dbContext.PersistedGrant.Find(filter)
+                            .CountAsync();
 
                     _logger.LogDebug($"Clearing ${expired} tokens");
 
@@ -69,37 +115,7 @@ namespace IdentityServer4.MongoDB
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Exception cleaning tokens ${ex.Message}");
-            }
-        }
-
-        private async Task Start(CancellationToken cancellationToken)
-        {
-            while (true)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogDebug("CancellationRequested");
-                    break;
-                }
-
-                try
-                {
-                    await Task.Delay(_interval, cancellationToken);
-                }
-                catch
-                {
-                    _logger.LogDebug("Task.Delay exception. exiting.");
-                    break;
-                }
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogDebug("CancellationRequested");
-                    break;
-                }
-
-                await ClearTokens();
+                _logger.LogError("Exception clearing tokens: {exception}", ex.Message);
             }
         }
     }

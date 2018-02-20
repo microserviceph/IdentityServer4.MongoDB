@@ -17,7 +17,6 @@ namespace QuickstartIdentityServer
         {
             services.AddMvc();
 
-            const string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;database=IdentityServer4.Quickstart.EntityFramework-2.0.0;trusted_connection=yes;";
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
             // configure identity server with in-memory stores, keys, clients and scopes
@@ -25,6 +24,24 @@ namespace QuickstartIdentityServer
                 .AddDeveloperSigningCredential()
                 .AddTestUsers(Config.GetUsers())
                 // this adds the config data from DB (clients, resources)
+                // Using Mongo DB
+                .AddConfigurationStore(option =>
+                {
+                    option.ConnectionString = "mongodb://192.168.1.125:27017";
+                    option.Database = "IdentityServer";
+                })
+                // this adds the operational data from DB (codes, tokens, consents)
+                .AddOperationalStore(option =>
+                {
+                    option.ConnectionString = "mongodb://192.168.1.125:27017";
+                    option.Database = "IdentityServer";
+
+                    // this enables automatic token cleanup. this is optional.
+                    option.EnableTokenCleanup = true;
+                    option.TokenCleanupInterval = 5*60;
+                });
+
+                /** Using EF
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = builder =>
@@ -42,6 +59,7 @@ namespace QuickstartIdentityServer
                     options.EnableTokenCleanup = true;
                     options.TokenCleanupInterval = 30;
                 });
+                 */
 
             services.AddAuthentication()
                 .AddGoogle("Google", options =>

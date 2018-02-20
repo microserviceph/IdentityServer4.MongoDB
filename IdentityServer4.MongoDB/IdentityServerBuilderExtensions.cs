@@ -5,42 +5,23 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IdentityServerBuilderExtensionsMongoDB
     {
-        public static IIdentityServerBuilder AddConfigurationDBOption(this IIdentityServerBuilder builder, IConfiguration config)
+        public static IIdentityServerBuilder AddConfigurationStore(this IIdentityServerBuilder builder,
+            Action<ConfigurationDBOption> storeOptionsAction = null)
         {
-            builder.Services.Configure<ConfigurationDBOption>(config);
+            // var options = new ConfigurationDBOption();
+            // storeOptionsAction?.Invoke(options);
+            // builder.Services.AddSingleton(options);
+            builder.Services.Configure<ConfigurationDBOption>(storeOptionsAction);
 
-            return builder;
-        }
-
-        public static IIdentityServerBuilder AddOperationMongoDBOption(this IIdentityServerBuilder builder, IConfiguration config)
-        {
-            builder.Services.Configure<OperationMongoDBOption>(config);
-
-            return builder;
-        }
-
-        public static IIdentityServerBuilder ConfigureConfigurationDBOption(this IIdentityServerBuilder builder, Action<ConfigurationDBOption> configure)
-        {
-            builder.Services.Configure(configure);
-
-            return builder;
-        }
-
-        public static IIdentityServerBuilder ConfigureOperationMongoDBOption(this IIdentityServerBuilder builder, Action<OperationMongoDBOption> configure)
-        {
-            builder.Services.Configure(configure);
-
-            return builder;
-        }
-
-        public static IIdentityServerBuilder AddConfigurationStore(this IIdentityServerBuilder builder)
-        {
             builder.Services.AddTransient<IConfigurationMongoDbContext, ConfigurationMongoDbContext>();
 
             builder.Services.AddTransient<IClientStore, ClientStore>();
@@ -52,31 +33,21 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IIdentityServerBuilder AddOperationalStore(
             this IIdentityServerBuilder builder,
-            Action<TokenCleanupOptions> tokenCleanUpOptions = null)
+            Action<OperationMongoDBOption> storeOptionsAction = null)
         {
+            // var options = new OperationMongoDBOption();
+            // storeOptionsAction?.Invoke(options);
+            builder.Services.Configure<OperationMongoDBOption>(storeOptionsAction);
+            // builder.Services.AddSingleton(options);
+
             builder.Services.AddTransient<IOperationDbContext, OperationDbContext>();
 
             builder.Services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
 
-            var tokenCleanupOptions = new TokenCleanupOptions();
-            tokenCleanUpOptions?.Invoke(tokenCleanupOptions);
-            builder.Services.AddSingleton(tokenCleanupOptions);
             builder.Services.AddSingleton<TokenCleanup>();
+            builder.Services.AddSingleton<IHostedService, TokenCleanupHost>();
 
             return builder;
-        }
-
-        public static IApplicationBuilder UseIdentityServerMongoDBTokenCleanup(this IApplicationBuilder app, IApplicationLifetime applicationLifetime)
-        {
-            var tokenCleanup = app.ApplicationServices.GetService<TokenCleanup>();
-            if (tokenCleanup == null)
-            {
-                throw new InvalidOperationException($"${nameof(AddOperationalStore)} must be called on the service collection.");
-            }
-            applicationLifetime.ApplicationStarted.Register(tokenCleanup.Start);
-            applicationLifetime.ApplicationStopping.Register(tokenCleanup.Stop);
-
-            return app;
         }
     }
 }
